@@ -1,5 +1,4 @@
 puts "Deleting seeds! 🗑"
-# Song.destroy_all
 User.destroy_all
 
 puts "Creating seeds! 🌸"
