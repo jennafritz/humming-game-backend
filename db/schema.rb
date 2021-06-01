@@ -11,6 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 2021_05_31_190347) do
+
   create_table "games", force: :cascade do |t|
     t.string "name"
   end
@@ -30,4 +31,5 @@ ActiveRecord::Schema.define(version: 2021_05_31_190347) do
     t.string "username"
     t.string "password"
   end
+
 end
