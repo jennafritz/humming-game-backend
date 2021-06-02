@@ -1,9 +1,6 @@
 require "pry"
 
-# $chosen_songs = []
-
 class Application
-  @@chosen_songs = []
 
   def call(env)
     req = Rack::Request.new(env)
@@ -18,6 +15,21 @@ class Application
       create_user_game(req)
     elsif req.path.match(/games/) && req.post?
       create_game(req)
+    elsif req.path.match(/users/) && req.patch?
+    send_points(req)
+    #  binding.pry
+    elsif req.path.match(/leaderboard/) && req.get?
+      send_leaderboard
+    elsif req.path.match(/check_user/) && req.get?
+      username_search = req.params["username"]
+      searched_user = User.all.find do |user_instance|
+        user_instance.username == username_search 
+      end
+      if searched_user
+        return [201, { "Content-Type" => "application/json" }, [{ :message => "This user already exists" }.to_json]]
+      else
+        return [201, { "Content-Type" => "application/json" }, [{ :message => "User does not exist" }.to_json]]
+      end
     elsif req.path.match(/users/) && req.get?
       username_search = req.params["username"]
       password_search = req.params["password"]
@@ -36,6 +48,8 @@ class Application
     end
   end
 
+  ###################  Methods
+
   def send_hello
     return [200, { "Content-Type" => "application/json" }, [{ :message => "hello world!" }.to_json]]
   end
@@ -49,7 +63,7 @@ class Application
   def create_user_game(req)
     user_game_hash = JSON.parse(req.body.read)
     new_user_game_instance = UserGame.create(user_game_hash)
-    binding.pry
+    # binding.pry
     return [201, { "Content-Type" => "application/json" }, [new_user_game_instance.to_json]]
   end
 
@@ -78,16 +92,26 @@ class Application
     #   self.class.chosen_songs << song_instance
     # end
     random_songs = chosen_songs.sample(60)
-    binding.pry
     return [201, { "Content-Type" => "application/json" }, [random_songs.to_json]]
   end
 
-  # def self.chosen_songs=()
-  #   @@chosen_songs
-  # end
-
   def self.chosen_songs
     @@chosen_songs
+  end
+
+  def send_points(req)
+    # user_id = req.params["id"]
+    final_point = JSON.parse(req.body.read)["point"]
+    selected_id = req.path.split("/").last.to_i
+    final_user = User.find(selected_id).update(point: final_point)
+    # User.where()
+    return [200, { "Content-Type" => "application/json" }, [{ :message => "Point updated" }.to_json]]
+  end
+
+  def send_leaderboard
+   leaderboard = User.all.order("point DESC")[0,10]
+  #  binding.pry
+   return [201, {"Content-Type" => "application/json"}, [leaderboard.to_json(:only => [:username, :point] )] ]
   end
 
   def send_not_found
