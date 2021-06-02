@@ -1,5 +1,7 @@
 require "pry"
 
+# $chosen_songs = []
+
 class Application
   @@chosen_songs = []
 
@@ -8,8 +10,10 @@ class Application
 
     if req.path.match(/hello/)
       send_hello
-    elsif req.path.match(/decades/) && req.get?
-      choose_decade(req)
+    # elsif req.path.match(/decades/) && req.get?
+    #   choose_decade(req)
+    elsif req.path.match(/songs/) && req.get?
+      send_songs(req)
     elsif req.path.match(/user_games/) && req.post?
       create_user_game(req)
     elsif req.path.match(/games/) && req.post?
@@ -31,8 +35,6 @@ class Application
       send_not_found
     end
   end
-
-  private
 
   def send_hello
     return [200, { "Content-Type" => "application/json" }, [{ :message => "hello world!" }.to_json]]
@@ -57,25 +59,27 @@ class Application
     return [201, { "Content-Type" => "application/json" }, [new_user_instance.to_json]]
   end
 
-  def choose_decade(req)
+  def send_songs(req)
     #   song_instance_array = Song.all
     #   return [200, { "Content-Type" => "application/json" }, [song_instance_array.to_json]]
-    decade_selected = req.params["year"].to_i
-    decade_end = decade_selected + 9
-    songs_selected_by_decade = Song.where("year BETWEEN ? AND ?", decade_selected, decade_end)
+    chosen_songs = []
+    req.params.values.map do |decade|
+      decade_selected = decade.to_i
+      decade_end = decade_selected + 9
+      songs_selected_by_decade = Song.where("year BETWEEN ? AND ?", decade_selected, decade_end)
+      songs_selected_by_decade.map do |song_instance|
+        chosen_songs << song_instance
+      end
+    end
     # songs_selected_by_decade = Song.all.select do |song_instance|
     #     song_instance.year >= decade_selected && song_instance.year <  decade_selected + 10
     # end
-    songs_selected_by_decade.map do |song_instance|
-      @@chosen_songs << song_instance
-    end
-    # binding.pry
-    return [201, { "Content-Type" => "application/json" }, [{ :message => "#{decade_selected} added to songs" }.to_json]]
-  end
-
-  def send_songs
-    four_random_songs = @@chosen_songs.sample(4)
-    return [201, { "Content-Type" => "application/json" }, [four_random_songs.to_json]]
+    # songs_selected_by_decade.map do |song_instance|
+    #   self.class.chosen_songs << song_instance
+    # end
+    random_songs = chosen_songs.sample(60)
+    binding.pry
+    return [201, { "Content-Type" => "application/json" }, [random_songs.to_json]]
   end
 
   # def self.chosen_songs=()
