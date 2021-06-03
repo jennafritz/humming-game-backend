@@ -77,7 +77,11 @@ class Application
     #   song_instance_array = Song.all
     #   return [200, { "Content-Type" => "application/json" }, [song_instance_array.to_json]]
     chosen_songs = []
-    req.params.values.map do |decade|
+    decades = req.params.select do |param|
+      param != "numSongs"
+    end
+
+    decades.values.map do |decade|
       decade_selected = decade.to_i
       decade_end = decade_selected + 9
       songs_selected_by_decade = Song.where("year BETWEEN ? AND ?", decade_selected, decade_end)
@@ -85,13 +89,16 @@ class Application
         chosen_songs << song_instance
       end
     end
+
+    num_songs = req.params["numSongs"].to_i
     # songs_selected_by_decade = Song.all.select do |song_instance|
     #     song_instance.year >= decade_selected && song_instance.year <  decade_selected + 10
     # end
     # songs_selected_by_decade.map do |song_instance|
     #   self.class.chosen_songs << song_instance
     # end
-    random_songs = chosen_songs.sample(60)
+    random_songs = chosen_songs.sample(num_songs)
+    binding.pry
     return [201, { "Content-Type" => "application/json" }, [random_songs.to_json]]
   end
 
