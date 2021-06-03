@@ -1,14 +1,13 @@
 require "pry"
 
 class Application
-
   def call(env)
     req = Rack::Request.new(env)
 
     if req.path.match(/hello/)
       send_hello
-    # elsif req.path.match(/decades/) && req.get?
-    #   choose_decade(req)
+      # elsif req.path.match(/decades/) && req.get?
+      #   choose_decade(req)
     elsif req.path.match(/songs/) && req.get?
       send_songs(req)
     elsif req.path.match(/user_games/) && req.post?
@@ -16,14 +15,13 @@ class Application
     elsif req.path.match(/games/) && req.post?
       create_game(req)
     elsif req.path.match(/users/) && req.patch?
-    send_points(req)
-    #  binding.pry
+      send_points(req)
     elsif req.path.match(/leaderboard/) && req.get?
       send_leaderboard
     elsif req.path.match(/check_user/) && req.get?
       username_search = req.params["username"]
       searched_user = User.all.find do |user_instance|
-        user_instance.username == username_search 
+        user_instance.username == username_search
       end
       if searched_user
         return [201, { "Content-Type" => "application/json" }, [{ :message => "This user already exists" }.to_json]]
@@ -63,7 +61,6 @@ class Application
   def create_user_game(req)
     user_game_hash = JSON.parse(req.body.read)
     new_user_game_instance = UserGame.create(user_game_hash)
-    # binding.pry
     return [201, { "Content-Type" => "application/json" }, [new_user_game_instance.to_json]]
   end
 
@@ -98,7 +95,6 @@ class Application
     #   self.class.chosen_songs << song_instance
     # end
     random_songs = chosen_songs.sample(num_songs)
-    binding.pry
     return [201, { "Content-Type" => "application/json" }, [random_songs.to_json]]
   end
 
@@ -116,9 +112,8 @@ class Application
   end
 
   def send_leaderboard
-   leaderboard = User.all.order("point DESC")[0,10]
-  #  binding.pry
-   return [201, {"Content-Type" => "application/json"}, [leaderboard.to_json(:only => [:username, :point] )] ]
+    leaderboard = User.all.order("point DESC")[0, 10]
+    return [201, { "Content-Type" => "application/json" }, [leaderboard.to_json(:only => [:username, :point])]]
   end
 
   def send_not_found
