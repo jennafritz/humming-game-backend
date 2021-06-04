@@ -9,4 +9,4 @@ gem 'shotgun'
 gem "require_all"
 gem "activerecord"
 gem "sinatra-activerecord"
-gem "sqlite3"
+gem "pg"
