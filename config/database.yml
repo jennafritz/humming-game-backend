@@ -1,11 +1,11 @@
 development:
-  adapter: postgresql
+  adapter: sqlite3
   database: db/songs_1950-2020.db
   pool: 5
   timeout: 5000
 
 production:
   adapter: postgresql
-  database: db/songs_1950-2020.db
+  database: HEROKU_POSTGRESQL_WHITE_URL
   pool: 5
   timeout: 5000
