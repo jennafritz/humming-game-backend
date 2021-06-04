@@ -44,12 +44,12 @@ User.create(
 )
 User.create(
   username: "Nicholas",
-  password: "j",
+  password: "nicholas",
   point: 25,
 )
 User.create(
   username: "Yosef",
-  password: "j",
+  password: "yosef",
   point: 15,
 )
 
